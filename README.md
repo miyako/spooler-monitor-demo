@@ -96,8 +96,13 @@ Mutations are opt-in and never run on their own:
 python3 scripts/verify.py --mutate spooler-demo
 ```
 
-Screenshots in `docs/` were captured with the full 4D application
-(`--startup-method console_screenshot`); `tool4d` cannot open a form window.
+`docs/console-static.png` is the form template as `fourdform` draws it;
+`docs/console-runtime.png` is a live capture with the full 4D application
+(`--startup-method console_screenshot`). `tool4d` cannot open a form window, so a
+runtime capture there is not possible — see finding 2 in the skills reference.
+
+The `tools/` binaries (`4dform`, `4dlsp`) come from
+[miyako/skills](https://github.com/miyako/skills) and are not committed.
 
 ## Chokepoints, fails and findings
 
