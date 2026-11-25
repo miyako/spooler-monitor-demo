@@ -1,0 +1,16 @@
+# 4D tooling provisioned locally from miyako/skills, not part of the demo
+/tools/4dform/
+/tools/4dlsp/
+
+# Dependency staged for local runs (fetched by scripts/fetch_dependency.py)
+/Components/
+
+# Generated at runtime
+/Data/
+/DerivedData/
+/Project/DerivedData/
+/Settings/
+/*.4DZ
+/userPreferences.*/
+*.preview.png
+.DS_Store

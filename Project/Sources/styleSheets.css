@@ -1,0 +1,67 @@
+/* Spooler Console — light dashboard under a dark header strip.
+   Structural properties stay in form.4DForm; only appearance lives here. */
+
+.header {
+	fill: #0F172A;
+	stroke: transparent;
+}
+
+.headerText {
+	color: #F8FAFC;
+}
+
+.headerDim {
+	color: #94A3B8;
+}
+
+.mono {
+	font-family: "Menlo", "Consolas", monospace;
+	font-size: 11px;
+}
+
+.monoSmall {
+	font-family: "Menlo", "Consolas", monospace;
+	font-size: 10px;
+}
+
+.label {
+	color: #6B7280;
+	font-size: 10px;
+}
+
+.note {
+	color: #6B7280;
+	font-size: 10px;
+}
+
+.detail {
+	color: #111827;
+}
+
+/* Explicit colours: the page is white in every appearance, so the text must
+   not inherit the system's light-on-dark default. */
+.ink {
+	color: #111827;
+}
+
+.listInk {
+	color: #111827;
+	fill: #FFFFFF;
+}
+
+.pageBg {
+	fill: #FFFFFF;
+	stroke: transparent;
+}
+
+.title {
+	color: #F8FAFC;
+	font-weight: bold;
+	font-size: 22px;
+}
+
+.badge {
+	color: #111827;
+	font-weight: bold;
+	font-size: 12px;
+}

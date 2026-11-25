@@ -1,0 +1,49 @@
+{
+  "bars": [
+    {
+      "id": 1,
+      "name": "Barre #1",
+      "items": [
+        { "link": 32001 },
+        { "link": 32002 },
+        { "link": 32003 },
+        { "link": 32004 }
+      ]
+    }
+  ],
+  "menus": [
+    {
+      "link": 32001,
+      "title": "File",
+      "items": [
+        { "title": "Quit", "shortcutAccel": true, "shortcutKey": "Q", "action": "quit" }
+      ]
+    },
+    {
+      "link": 32002,
+      "title": "Edit",
+      "items": [
+        { "title": "Undo", "shortcutAccel": true, "shortcutKey": "Z", "action": "undo" },
+        { "title": "(-", "isSeparator": true },
+        { "title": "Cut", "shortcutAccel": true, "shortcutKey": "X", "action": "cut" },
+        { "title": "Copy", "shortcutAccel": true, "shortcutKey": "C", "action": "copy" },
+        { "title": "Paste", "shortcutAccel": true, "shortcutKey": "V", "action": "paste" },
+        { "title": "Select All", "shortcutAccel": true, "shortcutKey": "A", "action": "selectAll" }
+      ]
+    },
+    {
+      "link": 32003,
+      "title": "Mode",
+      "items": [
+        { "title": "Design", "action": "design" }
+      ]
+    },
+    {
+      "link": 32004,
+      "title": "Spooler",
+      "items": [
+        { "title": "Open Spooler Console", "method": "Start" }
+      ]
+    }
+  ]
+}

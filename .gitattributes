@@ -1,0 +1,7 @@
+# Keep 4D text artifacts byte-identical across checkouts
+*.4dm text eol=lf
+*.4DForm text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.md text eol=lf
+*.py text eol=lf

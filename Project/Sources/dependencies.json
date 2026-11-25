@@ -1,0 +1,9 @@
+{
+	"version": 2100,
+	"dependencies": {
+		"spooler-monitor": {
+			"github": "miyako/spooler-monitor",
+			"tag": "0.1.1"
+		}
+	}
+}
