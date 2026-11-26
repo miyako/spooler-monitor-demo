@@ -59,11 +59,9 @@ Class constructor()
 
 	This.tool:=Null
 	This.ready:=False
-	This.connect()
 
 	This.componentLine:="spooler-monitor · "+This.target
 	This.capabilityLine:="capabilities not read yet"
-	This.refreshEnv()
 
 	This.rulesText:="list()/get() are snapshots — observedAt says when, it is not a live stream."+Char(13)+\
 	"acceptingJobs is Boolean or Null. Null means unknown; never show it as false."+Char(13)+\
@@ -95,6 +93,11 @@ Class constructor()
 	This.seq:=0
 	This.__page:=1
 	This.__screenshotPath:=""
+
+	// Last: connect() reports a missing component through statusBadge/statusText,
+	// which the defaults above would otherwise overwrite.
+	This.connect()
+	This.refreshEnv()
 
 // --- wiring -------------------------------------------------------------
 
@@ -181,7 +184,7 @@ Function envelope($operation : Text; $queueID : Text; $result : Object; $elapsed
 
 	// The component surfaces exitCode as a Real here (JSON-derived numbers are
 	// not guaranteed to arrive as Longint), so accept every numeric shape.
-	If (Value type($result.exitCode)=Is real) | (Value type($result.exitCode)=Is longint) | (Value type($result.exitCode)=Is integer)
+	If (This.isNumber($result.exitCode))
 		$payload.exitCode:=$result.exitCode
 		$payload.launched:=True
 	End if 
@@ -193,7 +196,7 @@ Function envelope($operation : Text; $queueID : Text; $result : Object; $elapsed
 	End if 
 	If (Value type($result.value)=Is object)
 		$payload.value:=$result.value
-		If (Value type($result.value.protocol)=Is real) | (Value type($result.value.protocol)=Is longint)
+		If (This.isNumber($result.value.protocol))
 			$payload.protocol:=$result.value.protocol
 		End if 
 	End if 
@@ -233,7 +236,9 @@ Function envelope($operation : Text; $queueID : Text; $result : Object; $elapsed
 // window is already on screen before the first external process starts.
 Function start()
 
-	If (This.busy)
+	// Already filled (the screenshot endpoint applies a bootstrap before the
+	// form opens): do not blank the values again.
+	If ((This.busy) | (This.requestCount>0))
 		return 
 	End if 
 	This.statusBadge:="WAIT"
@@ -260,7 +265,8 @@ Function request($operation : Text; $queueID : Text)
 // Worker callback (via CALL FORM). Applies the envelope and re-enables the UI.
 Function receive($payload : Object)
 
-	If (Value type($payload.seq)=Is longint)
+	// Numbers that travel inside an object arrive as Real, not Longint.
+	If (This.isNumber($payload.seq))
 		If ($payload.seq<This.seq)
 			return 
 		End if 
@@ -268,7 +274,7 @@ Function receive($payload : Object)
 	This.apply($payload)
 	This.busy:=False
 	This.inflight:=""
-	This.busyText:="idle · "+This.countText
+	This.busyText:="idle"
 
 // --- applying envelopes -------------------------------------------------
 
@@ -277,12 +283,8 @@ Function apply($payload : Object)
 	This.requestCount:=This.requestCount+1
 	This.countText:="requests: "+String(This.requestCount)
 	This.raw:=This.asText($payload.raw)
-	This.protocolText:=Choose(Value type($payload.protocol)=Is real; String($payload.protocol); "—")
-	If (Value type($payload.exitCode)=Is longint)
-		This.exitText:=String($payload.exitCode)
-	Else 
-		This.exitText:="no process"
-	End if 
+	This.protocolText:=This.protocolLabel($payload)
+	This.exitText:=This.exitLabel($payload)
 	This.elapsedText:=String($payload.elapsedMs)+" ms"
 	This.factText:="measured "+This.elapsedText+" · exit "+This.exitText+" · protocol "+This.protocolText
 	This.decodedText:=This.describe($payload)
@@ -341,12 +343,8 @@ Function applyBootstrap($payload : Object)
 	// The envelope panel speaks for the list call: it is the one whose payload
 	// the form shows. The total wall time covers all three processes.
 	This.raw:=This.asText($list.raw)
-	If (Value type($list.exitCode)=Is longint)
-		This.exitText:=String($list.exitCode)
-	Else 
-		This.exitText:="no process"
-	End if 
-	This.protocolText:=Choose(Value type($list.protocol)=Is real; String($list.protocol); "—")
+	This.exitText:=This.exitLabel($list)
+	This.protocolText:=This.protocolLabel($list)
 	This.factText:="3 calls measured "+String($payload.elapsedMs)+" ms · last exit "+This.exitText+" · protocol "+This.protocolText
 	This.decodedText:="decoded: version + capabilities + list"
 	If ($version.ok)
@@ -377,6 +375,7 @@ Function applyList($payload : Object)
 
 	This.queues:=New collection()
 	If (Value type($payload.queues)=Is collection)
+		var $queue : Object
 		For each ($queue; $payload.queues)
 			This.queues.push(This.rowFor($queue))
 		End for each 
@@ -566,6 +565,28 @@ Function booleanLabel($value : Variant)->$text : Text
 			return "—"
 	End case 
 
+Function isNumber($value : Variant)->$is : Boolean
+
+	$is:=(Value type($value)=Is real) | (Value type($value)=Is longint) | (Value type($value)=Is integer)
+
+Function exitLabel($payload : Object)->$text : Text
+
+	// "no process" only when nothing was launched; a launched process has a
+	// real exit code, zero included.
+	If (($payload.launched=True) & (This.isNumber($payload.exitCode)))
+		$text:=String($payload.exitCode)
+	Else 
+		$text:="no process"
+	End if 
+
+Function protocolLabel($payload : Object)->$text : Text
+
+	If (This.isNumber($payload.protocol))
+		$text:=String($payload.protocol)
+	Else 
+		$text:="—"
+	End if 
+
 Function asText($value : Variant)->$text : Text
 
 	Case of 
@@ -634,9 +655,12 @@ Function confirmMutation($operation : Text)
 	End if 
 	var $verb : Text
 	$verb:=Choose($operation="pause"; "Pause processing for"; "Resume processing for")
-	If (Not(CONFIRM($verb+" “"+This.idText+"”?"+Char(13)+Char(13)+\
+	// CONFIRM is a procedure, not a function: it reports the choice in OK, and its
+	// optional parameters are the OK then the Cancel button titles.
+	CONFIRM($verb+" “"+This.idText+"”?"+Char(13)+Char(13)+\
 	"This sends an explicit mutation for that exact id and changes the real print queue on this machine."+Char(13)+\
-	"Nothing is sent unless you press OK."; "Cancel"; "spooler-monitor · explicit mutation")))
+	"Nothing is sent unless you confirm."; Choose($operation="pause"; "Pause"; "Resume"); "Cancel")
+	If (OK#1)
 		This.statusBadge:="IDLE"
 		This.statusText:="Cancelled — no "+$operation+" was sent."
 		This.statusDetail:="outcome not_submitted · nothing left this process"
@@ -781,6 +805,7 @@ Function selfTest($options : Object)->$report : Object
 	$passed:=0
 	$failed:=0
 	$skipped:=0
+	var $check : Object
 	For each ($check; $checks)
 		Case of 
 			: ($check.status="passed")

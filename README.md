@@ -133,7 +133,9 @@ this repository.
 3. **`exitCode` arrives as a Real, not a Longint.** `Value type($result.exitCode)=Is longint`
    silently hides every exit code, which made the unknown-queue check fail with
    `exitCode: null` even though the CLI exited 3. Accept `Is real`, `Is longint`
-   and `Is integer`.
+   and `Is integer` through one helper (`isNumber`), and decide "no process" from
+   the `launched` flag, not from a type test. The same applies to `seq`, which
+   travels inside an object to the worker and back.
 
 4. **Mutations can be refused by the host, and that is not a demo bug.** On this
    macOS host both fresh queues answered `pause`/`resume` with exit 5
@@ -144,11 +146,13 @@ this repository.
    this as environment-dependent and never assume a mutation succeeded because the
    request was accepted.
 
-5. **Dark appearance is a trap for a white dashboard.** With a white page
-   background, `automaticAlternate` listbox rows rendered dark grey and default
-   text colours would have been light-on-light. Every text object carries an
-   explicit colour class and the listbox uses an explicit alternating fill
-   (`#F1F5F9`).
+5. **A hard-coded white page breaks in dark appearance.** The first version forced
+   a white page; with the system in dark mode the buttons and list header drew
+   light-on-light and were unreadable in the capture. The page now follows
+   `prefers-color-scheme` in `styleSheets.css`: every text object carries a colour
+   class, the list uses a class-driven `alternateFill`, and nothing is hard-coded
+   in `form.4DForm` (a JSON value would beat the stylesheet). Only the dark
+   appearance was captured; the light rules are not_run on a live window.
 
 6. **`Application version` returns `2102`, not `21.2`.** The header prints the raw
    string; do not parse it as a dotted version.
@@ -157,6 +161,11 @@ this repository.
    `LOG EVENT(Into system standard outputs; ...)` is the only reliable stdout from
    a headless method. `QUIT 4D` at the end of every CLI method, or `tool4d` waits
    for the 30 s timeout.
+
+8. **`CONFIRM` is a procedure.** It returns nothing and reports the choice in
+   `OK`; the optional arguments are the OK then the Cancel button titles.
+   `If (Not(CONFIRM(...)))` is wrong. The dialog needs a person, so the
+   confirmation path was not exercised headlessly (not_run).
 
 ## Status matrix
 

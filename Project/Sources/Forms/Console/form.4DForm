@@ -9,8 +9,8 @@
  "windowMinHeight": 860,
  "windowMaxWidth": 1180,
  "windowMaxHeight": 860,
- "rightMargin": 20,
- "bottomMargin": 20,
+ "rightMargin": 0,
+ "bottomMargin": 0,
  "events": [
   "onLoad",
   "onUnload"
@@ -120,7 +120,6 @@
      "height": 250,
      "rowHeight": "26px",
      "verticalAlign": "middle",
-     "alternateFill": "#F1F5F9",
      "resizingMode": "legacy",
      "currentItemPositionSource": "Form.selectedPos",
      "events": [
@@ -350,7 +349,8 @@
      "borderStyle": "none",
      "fill": "transparent",
      "multiline": "yes",
-     "wordwrap": "normal"
+     "wordwrap": "normal",
+     "scrollbarVertical": "automatic"
     },
     "decodedText": {
      "type": "input",
@@ -407,9 +407,7 @@
      "height": 24,
      "dataSourceTypeHint": "text",
      "enterable": true,
-     "class": "mono ink",
-     "borderStyle": "none",
-     "fill": "transparent"
+     "class": "mono field"
     },
     "btnPause": {
      "type": "button",
@@ -439,7 +437,7 @@
     },
     "noteAct": {
      "type": "text",
-     "text": "Pause stops processing, not admission. Nothing is sent without OK.",
+     "text": "Pause stops processing, not admission. Nothing is sent unless you confirm.",
      "left": 750,
      "top": 552,
      "width": 392,
@@ -568,7 +566,7 @@
      "left": 936,
      "top": 794,
      "width": 214,
-     "height": 16,
+     "height": 30,
      "class": "label"
     }
    }

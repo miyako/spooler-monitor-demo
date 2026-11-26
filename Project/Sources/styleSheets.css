@@ -1,5 +1,8 @@
-/* Spooler Console — light dashboard under a dark header strip.
-   Structural properties stay in form.4DForm; only appearance lives here. */
+/* Spooler Console — dashboard under a dark header strip.
+   Structural properties stay in form.4DForm; only appearance lives here.
+   The body follows the system appearance (prefers-color-scheme): every text
+   object carries a colour class, because an object without one would inherit
+   the system default and could end up light-on-light or dark-on-dark. */
 
 .header {
 	fill: #0F172A;
@@ -14,6 +17,12 @@
 	color: #94A3B8;
 }
 
+.title {
+	color: #F8FAFC;
+	font-weight: bold;
+	font-size: 22px;
+}
+
 .mono {
 	font-family: "Menlo", "Consolas", monospace;
 	font-size: 11px;
@@ -25,43 +34,60 @@
 }
 
 .label {
-	color: #6B7280;
 	font-size: 10px;
 }
 
 .note {
-	color: #6B7280;
 	font-size: 10px;
 }
 
-.detail {
-	color: #111827;
-}
-
-/* Explicit colours: the page is white in every appearance, so the text must
-   not inherit the system's light-on-dark default. */
-.ink {
-	color: #111827;
-}
-
-.listInk {
-	color: #111827;
-	fill: #FFFFFF;
-}
-
-.pageBg {
-	fill: #FFFFFF;
-	stroke: transparent;
-}
-
-.title {
-	color: #F8FAFC;
-	font-weight: bold;
-	font-size: 22px;
-}
-
 .badge {
-	color: #111827;
 	font-weight: bold;
 	font-size: 12px;
+}
+
+@media (prefers-color-scheme: light) {
+	.pageBg {
+		fill: #FFFFFF;
+		stroke: transparent;
+	}
+	.ink, .detail, .badge {
+		color: #111827;
+	}
+	.label, .note {
+		color: #6B7280;
+	}
+	.listInk, listbox.listInk {
+		color: #111827;
+		fill: #FFFFFF;
+		alternateFill: #F1F5F9;
+	}
+	.field {
+		color: #111827;
+		fill: #FFFFFF;
+		borderStyle: solid;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	.pageBg {
+		fill: #1B1F27;
+		stroke: transparent;
+	}
+	.ink, .detail, .badge {
+		color: #E5E7EB;
+	}
+	.label, .note {
+		color: #9CA3AF;
+	}
+	.listInk, listbox.listInk {
+		color: #E5E7EB;
+		fill: #1B1F27;
+		alternateFill: #242A35;
+	}
+	.field {
+		color: #E5E7EB;
+		fill: #11141A;
+		borderStyle: solid;
+	}
 }
