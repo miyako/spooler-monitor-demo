@@ -167,12 +167,20 @@ this repository.
    `If (Not(CONFIRM(...)))` is wrong. The dialog needs a person, so the
    confirmation path was not exercised headlessly (not_run).
 
+9. **A list box drops its selection when the collection is replaced.** With
+   `currentItemPositionSource: Form.selectedPos`, every `Form.queues:=...` resets the
+   position to 0, so after a refresh the detail panel still described a queue while
+   **get selected** answered "No row selected". Headless runs cannot show this: it
+   was found by clicking the live form. `selectCurrent()` now falls back to
+   `selectedQueue`, and `receive()` re-selects the row with `LISTBOX SELECT ROW`.
+
 ## Status matrix
 
 | Check | Status | Evidence |
 | --- | --- | --- |
 | tool4d 21.2 source acceptance, macOS arm64 | passed | `scripts/verify.py`, 7 checks |
 | Full 4D runtime capture, macOS arm64 | passed | `docs/console-runtime.png` |
+| Live UI clicks, macOS arm64 | passed | refresh, get, version, capabilities, both rejections, copy, confirm Cancel and OK; light appearance not_run |
 | Form schema (4dform `boon`) + LSP validation | passed | `.agents/schemas/4dform/formsSchema.json` |
 | `pause`/`resume` on this host | failed | exit 5 `backend_unavailable`, `uncertain` (see finding 4) |
 | Windows-x64 CLI / winspool backend | not_run | no Windows host |

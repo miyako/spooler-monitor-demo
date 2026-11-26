@@ -272,6 +272,11 @@ Function receive($payload : Object)
 		End if 
 	End if 
 	This.apply($payload)
+	// Re-highlight the row the detail panel describes (the list box drops the
+	// selection when the collection is replaced). No window yet = capture path.
+	If ((Current form window#0) & (This.selectedPos>0))
+		LISTBOX SELECT ROW(*; "lbQueues"; This.selectedPos; lk replace selection)
+	End if 
 	This.busy:=False
 	This.inflight:=""
 	This.busyText:="idle"
@@ -618,6 +623,11 @@ Function selectRow($position : Integer; $issueGet : Boolean)
 
 Function selectCurrent()
 
+	// The list box resets selectedPos to 0 whenever Form.queues is replaced, so
+	// the row the detail panel shows is tracked by selectedQueue as well.
+	If ((This.selectedPos<1) & (Value type(This.selectedQueue)=Is object))
+		This.selectedPos:=This.indexOfQueue(This.asText(This.selectedQueue.id))
+	End if 
 	If (This.selectedPos<1)
 		This.statusBadge:="IDLE"
 		This.statusText:="No row selected — click a queue first."
